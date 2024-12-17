@@ -48,13 +48,13 @@ class DrawStartFrame(ctk.CTkFrame):
         self.grid_columnconfigure(4, weight=2)
 
         # Add open button
-        self.open_icon = ctk.CTkImage(Image.open(self.image_path + 'existed_dataset.png'), size=(40, 40))
+        self.open_icon = ctk.CTkImage(Image.open(self.image_path + 'existed_dataset.png'), size=(80, 80))
         self.open_button = ctk.CTkButton(self, image=self.open_icon, text='Open Existing\nDataset',
                                          command=self.open_button_event, **self.button_setting)
         self.open_button.grid(row=1, column=1)
 
          # Add create button
-        self.create_icon = ctk.CTkImage(Image.open(self.image_path + 'new_dataset.png'), size=(40, 40))
+        self.create_icon = ctk.CTkImage(Image.open(self.image_path + 'new_dataset.png'), size=(80, 80))
         self.create_button = ctk.CTkButton(self, image=self.create_icon, text='Create New\nDataset',
                                            command=self.create_button_event, **self.button_setting)
         self.create_button.grid(row=1, column=3)
@@ -148,17 +148,20 @@ class DrawMainFrame(ctk.CTkFrame):
         self.clear_button.place(x=0, y=0)
 
         # Add button frame and buttons
-        self.button_frame = ctk.CTkFrame(self)
+        self.button_frame = ctk.CTkFrame(self,
+                                         border_width=1,
+                                         border_color='#CB4343',
+                                         )
         self.button_frame.grid(row=0, column=1, sticky='nsew')
-        self.button_frame.grid_rowconfigure(5, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(1, weight=1)
         self.button_frame.grid_rowconfigure(2, weight=1)
         self.button_frame.grid_rowconfigure(3, weight=1)
         self.button_frame.grid_rowconfigure(4, weight=1)
+        self.button_frame.grid_rowconfigure(5, weight=1)
 
         # Add dataset label
-        self.data_image_icon = ctk.CTkImage(Image.open(self.image_path + 'existed_dataset.png'), size=(30, 30))
+        self.data_image_icon = ctk.CTkImage(Image.open(self.image_path + 'existed_dataset.png'), size=(80, 80))
         self.dataset_label = ctk.CTkLabel(self.button_frame, font=ctk.CTkFont(size=20, weight="bold"), compound='top', image=self.data_image_icon, height=60)
         self.dataset_label.grid(row=0, column=0, padx=10, pady=10, sticky='new')
 
@@ -196,12 +199,17 @@ class DrawMainFrame(ctk.CTkFrame):
         # Add label
         self.artist_frame = ctk.CTkFrame(self.button_frame)
         self.artist_frame.grid(row=5, column=0, sticky='nsew')
-        self.artist_icon = ctk.CTkImage(Image.open(self.image_path + 'artist.png'), size=(100, 100))
+        self.artist_icon = ctk.CTkImage(Image.open(self.image_path + 'artist.png'), size=(120, 120))
         self.artist_label = ctk.CTkLabel(self.artist_frame, image=self.artist_icon, text='', compound='bottom')
         # self.artist_label.grid(row=5, column=0, padx=10, sticky='nsew')
         self.artist_label.pack(fill='both', expand=True)
+        
         # Add message box
-        self.message_box = ctk.CTkTextbox(self, font=ctk.CTkFont(size=15))
+        self.message_box = ctk.CTkTextbox(
+            self, 
+            font=ctk.CTkFont(size=15, weight="bold"),
+            fg_color="#CCCACA",
+            text_color="black")
         self.message_box.insert(tk.INSERT, 'MESSAGE BOX\n')
         self.message_box.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
         self.message_box.configure(state="disabled")
