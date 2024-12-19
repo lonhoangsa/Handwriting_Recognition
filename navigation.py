@@ -17,13 +17,13 @@ class NavigationFrame(ctk.CTkFrame):
         self.image_path = config.IMAGE_PATH
         
         #Setting up the images
-        self.menu_image = ctk.CTkImage(Image.open(self.image_path + r'\menu_icon.png'), size=(30,30))
-        self.home_image = ctk.CTkImage(Image.open(self.image_path + r'\home.png'), size=(20,20))
-        self.draw_image = ctk.CTkImage(Image.open(self.image_path + r'\draw.png'), size=(20,20))
-        self.train_image = ctk.CTkImage(Image.open(self.image_path + r'\train.png'), size=(20,20))
-        self.predict_image = ctk.CTkImage(Image.open(self.image_path + r'\predict.png'), size=(20,20))
-        self.hand_rec_image = ctk.CTkImage(Image.open(self.image_path + r'\hand_rec.png'), size=(20,20))
-        self.exit_image = ctk.CTkImage(Image.open(self.image_path + r'\exit.png'), size=(20,20))
+        self.menu_image = ctk.CTkImage(Image.open(self.image_path + r'\menu_icon.png'), size=(40,40))
+        self.home_image = ctk.CTkImage(Image.open(self.image_path + r'\home.png'), size=(40,40))
+        self.draw_image = ctk.CTkImage(Image.open(self.image_path + r'\draw.png'), size=(40,40))
+        self.train_image = ctk.CTkImage(Image.open(self.image_path + r'\train.png'), size=(40,40))
+        self.predict_image = ctk.CTkImage(Image.open(self.image_path + r'\predict.png'), size=(40,40))
+        self.hand_rec_image = ctk.CTkImage(Image.open(self.image_path + r'\hand_rec.png'), size=(40,40))
+        self.exit_image = ctk.CTkImage(Image.open(self.image_path + r'\exit.png'), size=(40,40))
         
         #Setting up the grid
         self.grid_columnconfigure(index=0, weight=1)

@@ -77,28 +77,38 @@ class TrainFrame(ctk.CTkFrame):
 
         # Add 2x2 grid
         self.grid_columnconfigure(0, weight=4)
+        self.grid_columnconfigure(1, weight=4)
         self.grid_rowconfigure(0, weight=4)
         self.grid_rowconfigure(1, weight=2)
 
         # Add param frame
-        self.param_frame = ctk.CTkFrame(self)
+        self.param_frame = ctk.CTkFrame(self,
+                                        border_width=3,     # Độ dày đường viền
+                                        border_color="#5A5A5A"    # Màu viền trắng
+                                        )
         self.param_frame.grid(row=0, column=0, sticky='nsew', padx=10)
         self.param_frame.grid_columnconfigure(0, weight=1)
         self.param_frame.grid_columnconfigure(1, weight=1)
-        self.param_frame.grid_columnconfigure(2, weight=1)
         self.param_frame.grid_rowconfigure(0, weight=1)
         self.param_frame.grid_rowconfigure(1, weight=1)
 
         # add knn frame
-        self.knn_frame = ctk.CTkFrame(self.param_frame)
+        self.knn_frame = ctk.CTkFrame(self.param_frame,
+                                      border_width=1,     
+                                      border_color="#CB4343"    
+                                     )
         self.knn_frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
-        self.knn_label = ctk.CTkLabel(master=self.knn_frame, text="K-Nearest Neighbours", font=ctk.CTkFont(size=20, weight="bold"))
+        self.knn_frame.grid_columnconfigure(0, weight=1) 
+        self.knn_label = ctk.CTkLabel(master=self.knn_frame, 
+                                      text="K-Nearest Neighbours",
+                                      font=ctk.CTkFont(size=20, weight="bold"))
         self.knn_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.k_choice_entry = ctk.CTkEntry(self.knn_frame, corner_radius=10, placeholder_text='Enter k', height=30)
         self.k_choice_entry.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
         self.p_choice_entry = ctk.CTkEntry(self.knn_frame, corner_radius=10, placeholder_text='Enter p', height=30)
         self.p_choice_entry.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
         self.metrics_menu = ctk.CTkComboBox(self.knn_frame, height=30, values=['uniform', 'distance'], 
+                                            state="readonly"
                                             #command=self.knn_metrics_event
                                             )
         self.metrics_menu.set('Choose weights')
@@ -108,46 +118,36 @@ class TrainFrame(ctk.CTkFrame):
 
 
 
-        # add dbscan frame
-        self.dbscan_frame = ctk.CTkFrame(self.param_frame)
-        self.dbscan_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
-        self.dbscan_frame.grid_columnconfigure(0, weight=1) 
-        self.dbscan_label = ctk.CTkLabel(master=self.dbscan_frame, text="    DBSCAN   ", font=ctk.CTkFont(size=20, weight="bold"))
-        self.dbscan_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.dbscan_eps_choice_entry = ctk.CTkEntry(self.dbscan_frame, corner_radius=10, placeholder_text='Enter eps', height=30)
-        self.dbscan_eps_choice_entry.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
-        self.dbscan_min_samples_choice_entry = ctk.CTkEntry(self.dbscan_frame, corner_radius=10, placeholder_text='Enter min samples', height=30)
-        self.dbscan_min_samples_choice_entry.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
-        self.dbscan_penalty_menu = ctk.CTkComboBox(self.dbscan_frame, height=30, values=['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'haversine'], 
-                                                #command=self.svm_penalty_event
-                                                )
-        self.dbscan_penalty_menu.set('Choose metric')
-        self.dbscan_penalty_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
+        # add SVM frame
+        self.svm_frame = ctk.CTkFrame(self.param_frame,
+                                      border_width=1,     
+                                      border_color="#CB4343"
+                                    )
+        self.svm_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
+        self.svm_frame.grid_columnconfigure(0, weight=1) 
+        self.svm_label = ctk.CTkLabel(master=self.svm_frame, 
+                                         text="     SVM     ", 
+                                         font=ctk.CTkFont(size=20, weight="bold"))
+        self.svm_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.svm_choice_1 = ctk.CTkEntry(self.svm_frame, corner_radius=10, placeholder_text='Enter max iterations', height=30)
+        self.svm_choice_1.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
+        self.svm_choice_2 = ctk.CTkEntry(self.svm_frame, corner_radius=10, placeholder_text='Enter c', height=30)
+        self.svm_choice_2.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
+        self.svm_kernel_menu = ctk.CTkComboBox(self.svm_frame, 
+                                                   height=30, 
+                                                   values=['linear', 'poly', 'rbf', 'sigmoid'], 
+                                                   state="readonly"
+                                                  )
+        self.svm_kernel_menu.set('Choose kernel')
+        self.svm_kernel_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
 
-        # dbscan parmas  
-
-
-        # add cnn frame
-        self.cnn_frame = ctk.CTkFrame(self.param_frame)
-        self.cnn_frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
-        self.cnn_label = ctk.CTkLabel(master=self.cnn_frame, text="Convolutional Neural Networks", font=ctk.CTkFont(size=20, weight="bold"))
-        self.cnn_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.cnn_input_shape_entry = ctk.CTkEntry(self.cnn_frame, corner_radius=10, placeholder_text='Enter input shape', height=30)
-        self.cnn_input_shape_entry.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
-        self.cnn_c_choice_entry = ctk.CTkEntry(self.cnn_frame, corner_radius=10, placeholder_text='Enter filters', height=30)
-        self.cnn_c_choice_entry.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
-        self.cnn_penalty_menu = ctk.CTkComboBox(self.cnn_frame, height=30, values=['True', 'False'], 
-                                               #command=self.lr_penalty_event
-                                               )
-        self.cnn_penalty_menu.set('Choose bias')
-        self.cnn_penalty_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
-
-        # Logistics Regression params
-        self.lr_C = 1.0
-        self.lr_penalty = 'l2'
+        # dbscan params 
 
         # Add button frame and buttons
-        self.button_frame = ctk.CTkFrame(self)
+        self.button_frame = ctk.CTkFrame(self,
+                                        border_width=1,     # Độ dày đường viền
+                                        border_color="white"    # Màu viền trắng
+                                        )
         self.button_frame.grid(row=0, column=1, sticky='nsew')
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(1, weight=1)
@@ -210,9 +210,14 @@ class TrainFrame(ctk.CTkFrame):
         self.canvas_learning_curve.get_tk_widget().grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
 
         # Add result box
-        self.result_box = ctk.CTkTextbox(self, font=ctk.CTkFont(size=15))
+        self.result_box = ctk.CTkTextbox(
+            self, 
+            font=ctk.CTkFont(size=15, weight="bold"),
+            border_width=3,        # Độ dày viền
+            border_color="white"   # Màu viền trắng
+        )
         self.result_box.insert(tk.INSERT, 'RESULT BOX\n')
-        self.result_box.grid(row=1, column=1, sticky='nsew')
+        self.result_box.grid(row=1, column=1, sticky='nsew', padx=10, pady=10)
         self.result_box.configure(state="disabled")
 
         # Add model
