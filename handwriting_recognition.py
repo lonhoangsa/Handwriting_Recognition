@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 from tkinter import messagebox
 
 import config
-from model.utils import load_model, preprocess_image, predict_characters
+from models.utils import load_model, preprocess_image, predict_characters
 from utils import process_image
 
 
@@ -153,17 +153,17 @@ class HandwritingRecognitionFrame(ctk.CTkFrame):
     def model_menu_event(self, choice):
         self.model_type = choice
 
-        # Open model in the dir
+        # Open models in the dir
         result = " "
         if len(result) == 0:
-            showerror(message="Please choose a model", title='Error')
+            showerror(message="Please choose a models", title='Error')
         else:
-            # Load the model
+            # Load the models
             self.model = load_model(model_name=str(self.model_type).lower())
 
     def predict_button_event(self):
         if self.model is None:
-            showerror(message="Please choose a model first", title='Error')
+            showerror(message="Please choose a models first", title='Error')
         else:
 
             img_array = process_image(self.image_path)

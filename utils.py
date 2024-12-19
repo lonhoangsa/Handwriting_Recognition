@@ -26,8 +26,6 @@ def process_image(img_path):
     img = np.c_[np.zeros((new_rows, add_cols)), img, np.zeros((new_rows, add_cols))]
 
     # Resize
-    # roi = cv2.resize(img, (28, 28), interpolation=cv2.INTER_AREA) / 255
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # img = cv2.bitwise_not(img)  # Invert colors to make background white and items black
+    roi = cv2.resize(img, (28, 28), interpolation=cv2.INTER_AREA) / 255
 
-    return img
+    return roi
