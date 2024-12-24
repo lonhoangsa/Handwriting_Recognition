@@ -81,7 +81,7 @@ class ImageViewer(ctk.CTkFrame):
 
     def show_image(self):
         # Display image and label
-        image = ctk.CTkImage(Image.fromarray(self.images[self.index] * 255), size=(300, 300))
+        image = ctk.CTkImage(Image.fromarray((self.images[self.index] * 255).astype(np.uint8)), size=(300, 300))
         label = self.images_label[self.index]
         self.label.configure(image=image, text=f'Image Label: {label}', font=("'Helvetica'", 20))
 
@@ -144,7 +144,7 @@ class PredictStartFrame(ctk.CTkFrame):
             if len(result) > 0:
                 # Update dataset name and display the batch frame
                 self.container.predict_batch_frame.dataset_name = result.split(r'/')[-1]
-                self.container.predict_batch_frame.directory = result + r'//'
+                self.container.predict_batch_frame.directory = result + r'/'
                 self.grid_forget()
                 self.container.predict_batch_frame.update_label()
                 self.container.predict_batch_frame.grid(row=0, column=1, sticky='nsew')
@@ -245,7 +245,11 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
         """
 
         # Add message box
-        self.message_box = ctk.CTkTextbox(self, font=ctk.CTkFont(size=15))
+        self.message_box = ctk.CTkTextbox(self, 
+                                          font=ctk.CTkFont(size=15, weight="bold"),
+                                          border_width=1,
+                                          border_color='white'
+                                          )
         self.message_box.insert(tk.INSERT, 'MESSAGE BOX\n')
         self.message_box.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
         self.message_box.configure(state="disabled")
@@ -268,6 +272,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def draw_button_event(self):
         self.draw_button.configure(fg_color='gray25')
         self.canvas.configure(cursor='circle')
+        self.canvas.configure(highlightthickness=4, highlightbackground='green')
         self.canvas.bind('<1>', self.activate_paint)
 
 

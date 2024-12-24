@@ -87,61 +87,190 @@ class TrainFrame(ctk.CTkFrame):
                                         border_color="#5A5A5A"    # Màu viền trắng
                                         )
         self.param_frame.grid(row=0, column=0, sticky='nsew', padx=10)
-        self.param_frame.grid_columnconfigure(0, weight=1)
-        self.param_frame.grid_columnconfigure(1, weight=1)
-        self.param_frame.grid_rowconfigure(0, weight=1)
-        self.param_frame.grid_rowconfigure(1, weight=1)
+        # Adjusting the layout for better balance and alignment
+        # Update grid configuration and frame dimensions
+        self.param_frame.grid_rowconfigure(0, weight=1)  # Adjust overall row height
+        self.param_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)  # Set equal width for all columns
 
-        # add knn frame
-        self.knn_frame = ctk.CTkFrame(self.param_frame,
-                                      border_width=1,     
-                                      border_color="#CB4343"    
-                                     )
+        # KNN Frame
+        # Tạo frame cho KNN
+        self.knn_frame = ctk.CTkFrame(
+            self.param_frame,
+            border_width=1,
+            border_color="#CB4343",
+            corner_radius=10
+        )
         self.knn_frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
-        self.knn_frame.grid_columnconfigure(0, weight=1) 
-        self.knn_label = ctk.CTkLabel(master=self.knn_frame, 
-                                      text="K-Nearest Neighbours",
-                                      font=ctk.CTkFont(size=20, weight="bold"))
-        self.knn_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.k_choice_entry = ctk.CTkEntry(self.knn_frame, corner_radius=10, placeholder_text='Enter k', height=30)
-        self.k_choice_entry.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
-        self.p_choice_entry = ctk.CTkEntry(self.knn_frame, corner_radius=10, placeholder_text='Enter p', height=30)
-        self.p_choice_entry.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
-        self.metrics_menu = ctk.CTkComboBox(self.knn_frame, height=30, values=['uniform', 'distance'], 
-                                            state="readonly"
-                                            #command=self.knn_metrics_event
-                                            )
-        self.metrics_menu.set('Choose weights')
-        self.metrics_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
 
-        # k-NN Params
+        # Cấu hình lưới (grid)
+        self.knn_frame.grid_rowconfigure((0, 1, 2, 3), weight=1)  # Các hàng có chiều cao cân bằng
+        self.knn_frame.grid_columnconfigure(0, weight=1)  # Cột đầu tiên co giãn theo chiều ngang
+
+        # Tiêu đề KNN
+        self.knn_label = ctk.CTkLabel(
+            self.knn_frame, 
+            text="KNN",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.knn_label.grid(row=0, column=0, padx=10, pady=5, sticky="ns")  # Gắn nhãn phía trên, căn giữa
+
+        # Nhập số n_neighbors
+        self.k_choice_entry = ctk.CTkEntry(
+            self.knn_frame, 
+            placeholder_text='n_neighbors'
+        )
+        self.k_choice_entry.grid(row=1, column=0, padx=10, pady=5, sticky="ew")  # Co giãn ngang
+
+        # Menu chọn Algorithm
+        self.algo_menu = ctk.CTkComboBox(
+            self.knn_frame, 
+            values=['auto', 'ball_tree', 'kd_tree', 'brute'],
+            state='readonly'
+        )
+        self.algo_menu.set('Algorithm')
+        self.algo_menu.grid(row=2, column=0, padx=10, pady=5, sticky="ew")  # Co giãn ngang
+
+        # Menu chọn Weights
+        self.metrics_menu = ctk.CTkComboBox(
+            self.knn_frame, 
+            values=['uniform', 'distance'],
+            state='readonly'
+        )
+        self.metrics_menu.set('Weights')
+        self.metrics_menu.grid(row=3, column=0, padx=10, pady=5, sticky="ew")  # Co giãn ngang
 
 
-
-        # add SVM frame
-        self.svm_frame = ctk.CTkFrame(self.param_frame,
-                                      border_width=1,     
-                                      border_color="#CB4343"
-                                    )
+        # SVM Frame
+        self.svm_frame = ctk.CTkFrame(
+            self.param_frame,
+            border_width=1,
+            border_color="#CB4343",
+            corner_radius=10
+        )
         self.svm_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
-        self.svm_frame.grid_columnconfigure(0, weight=1) 
-        self.svm_label = ctk.CTkLabel(master=self.svm_frame, 
-                                         text="     SVM     ", 
-                                         font=ctk.CTkFont(size=20, weight="bold"))
-        self.svm_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.svm_choice_1 = ctk.CTkEntry(self.svm_frame, corner_radius=10, placeholder_text='Enter max iterations', height=30)
-        self.svm_choice_1.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
-        self.svm_choice_2 = ctk.CTkEntry(self.svm_frame, corner_radius=10, placeholder_text='Enter c', height=30)
-        self.svm_choice_2.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
-        self.svm_kernel_menu = ctk.CTkComboBox(self.svm_frame, 
-                                                   height=30, 
-                                                   values=['linear', 'poly', 'rbf', 'sigmoid'], 
-                                                   state="readonly"
-                                                  )
-        self.svm_kernel_menu.set('Choose kernel')
-        self.svm_kernel_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
 
-        # dbscan params 
+        # Configure grid
+        self.svm_frame.grid_rowconfigure((0, 1, 2, 3), weight=1)  # Equal row height
+        self.svm_frame.grid_columnconfigure(0, weight=1)  # Column 0 stretches horizontally
+
+        # Title SVM
+        self.svm_label = ctk.CTkLabel(
+            self.svm_frame, 
+            text="SVM",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.svm_label.grid(row=0, column=0, padx=10, pady=5, sticky="ns")  # Top-centered label
+
+        # Input for C
+        self.svm_choice_1 = ctk.CTkEntry(
+            self.svm_frame, 
+            placeholder_text='C'
+        )
+        self.svm_choice_1.grid(row=1, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Menu to choose Gamma
+        self.svm_gamma_menu = ctk.CTkComboBox(
+            self.svm_frame, 
+            values=['scale', 'auto'],
+            state='readonly'
+        )
+        self.svm_gamma_menu.set('Gamma')
+        self.svm_gamma_menu.grid(row=2, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Menu to choose Kernel
+        self.svm_kernel_menu = ctk.CTkComboBox(
+            self.svm_frame, 
+            values=['linear', 'poly', 'rbf', 'sigmoid'],
+            state='readonly'
+        )
+        self.svm_kernel_menu.set('Kernel')
+        self.svm_kernel_menu.grid(row=3, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # RF Frame
+        self.rf_frame = ctk.CTkFrame(
+            self.param_frame,
+            border_width=1,
+            border_color="#CB4343",
+            corner_radius=10
+        )
+        self.rf_frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
+
+        # Configure grid
+        self.rf_frame.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)  # Equal row height
+        self.rf_frame.grid_columnconfigure(0, weight=1)  # Column 0 stretches horizontally
+
+        # Title RF
+        self.rf_label = ctk.CTkLabel(
+            self.rf_frame, 
+            text="RF",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.rf_label.grid(row=0, column=0, padx=10, pady=5, sticky="ns")  # Top-centered label
+
+        # Input for max_depth
+        self.rf_max_depth = ctk.CTkEntry(
+            self.rf_frame, 
+            placeholder_text='max_depth'
+        )
+        self.rf_max_depth.grid(row=1, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Input for min_samples_split
+        self.rf_min_samples_split = ctk.CTkEntry(
+            self.rf_frame, 
+            placeholder_text='min_samples_split'
+        )
+        self.rf_min_samples_split.grid(row=2, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Input for min_samples_leaf
+        self.rf_min_samples_leaf = ctk.CTkEntry(
+            self.rf_frame, 
+            placeholder_text='min_samples_leaf'
+        )
+        self.rf_min_samples_leaf.grid(row=3, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Input for n_estimators
+        self.rf_n_estimators = ctk.CTkEntry(
+            self.rf_frame, 
+            placeholder_text='n_estimators'
+        )
+        self.rf_n_estimators.grid(row=4, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # LR Frame
+        self.lr_frame = ctk.CTkFrame(
+            self.param_frame,
+            border_width=1,
+            border_color="#CB4343",
+            corner_radius=10
+        )
+        self.lr_frame.grid(row=0, column=3, sticky='nsew', padx=10, pady=10)
+
+        # Configure grid
+        self.lr_frame.grid_rowconfigure((0, 1, 2), weight=1)  # Equal row height
+        self.lr_frame.grid_columnconfigure(0, weight=1)  # Column 0 stretches horizontally
+
+        # Title LR
+        self.lr_label = ctk.CTkLabel(
+            self.lr_frame, 
+            text="LR",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.lr_label.grid(row=0, column=0, padx=10, pady=5, sticky="ns")  # Top-centered label
+
+        # Menu to choose Solver
+        self.lr_solver_menu = ctk.CTkComboBox(
+            self.lr_frame, 
+            values=['lbfgs', 'newton-cg', 'newton-cholesky', 'sag', 'saga'],
+            state='readonly'
+        )
+        self.lr_solver_menu.set('Solver')
+        self.lr_solver_menu.grid(row=1, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
+
+        # Input for C
+        self.lr_c = ctk.CTkEntry(
+            self.lr_frame, 
+            placeholder_text='C'
+        )
+        self.lr_c.grid(row=2, column=0, padx=10, pady=5, sticky="ew")  # Horizontally expandable
 
         # Add button frame and buttons
         self.button_frame = ctk.CTkFrame(self,
@@ -181,7 +310,9 @@ class TrainFrame(ctk.CTkFrame):
         self.save_button.grid(row=2, column=0, padx=10, pady=10, sticky='ew')
         
         # Add choose model
-        self.model_menu = ctk.CTkComboBox(self.button_frame, height=30, values=[name for name in config.MODEL_LIST], 
+        self.model_menu = ctk.CTkComboBox(self.button_frame, height=30, 
+                                          values=[name for name in config.MODEL_LIST], 
+                                          state='readonly'
                                           #command=self.model_menu_event
                                           )
         self.model_menu.set('Choose Current Model')
