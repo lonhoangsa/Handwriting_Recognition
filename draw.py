@@ -10,6 +10,8 @@ from PIL import Image, ImageDraw
 from tkinter.messagebox import showerror
 from tkinter import filedialog
 from utils import process_image
+from PIL import ImageOps  # Để thao tác ảnh (resize và chuyển grayscale)
+import numpy as np
 
 
 class DrawStartFrame(ctk.CTkFrame):
@@ -70,7 +72,7 @@ class DrawStartFrame(ctk.CTkFrame):
         if len(result) > 0:
             # get the dataset name and its directory
             self.container.draw_main_frame.dataset_name = result.split(r'/')[-1]
-            self.container.draw_main_frame.directory = result + r'//'
+            self.container.draw_main_frame.directory = result + r'/'
             
             # Close start frame and activate main frame
             self.grid_forget()  
@@ -97,7 +99,11 @@ class DrawStartFrame(ctk.CTkFrame):
                 showerror(message='Dataset already exists. Please try another name', title='Name Error')
             else:
                 # Create a file that contains summaries about the dataset
-                meta_data = pd.DataFrame({'Label': range(10), 'Count': 0})
+                # Tạo danh sách các chữ cái từ 'a' đến 'z'
+                columns = [chr(i) for i in range(ord('a'), ord('z') + 1)]
+
+                # Tạo DataFrame với các cột từ 'a' đến 'z' và giá trị mặc định là 0
+                meta_data = pd.DataFrame({'Label': columns, 'Count': 0})
                 meta_data.to_csv(self.container.draw_main_frame.directory + 'meta.csv', index=False)
                 headers = [f'pixel {i}' for i in range(784)] + ['label']
                 summary_data = pd.DataFrame(columns=headers)
@@ -181,7 +187,7 @@ class DrawMainFrame(ctk.CTkFrame):
         self.thick_combobox.grid(row=3, column=0, padx=10, pady=15, sticky='ew')
 
         # Add Label Entry
-        self.label_entry = ctk.CTkEntry(self.button_frame, corner_radius=10, placeholder_text='Enter the image label', height=30)
+        self.label_entry = ctk.CTkEntry(self.button_frame, corner_radius=10, placeholder_text='Enter the image label', height=30, width = 100)
         self.label_entry.grid(row=4, column=0, padx=10, pady=15, sticky='ew')
 
         # Image backend
@@ -189,11 +195,16 @@ class DrawMainFrame(ctk.CTkFrame):
         self.draw = ImageDraw.Draw(self.current_image)
 
         # Add Save Button
-        self.save_icon = ctk.CTkImage(Image.open(self.image_path + 'save.png'), size=(25, 25))
-        self.save_button = ctk.CTkButton(self.button_frame, corner_radius=10, image=self.save_icon,
-                                         compound='left', text='Save', anchor='w', border_spacing=10, height=25,
-                                         text_color='gray90', hover_color='gray30', fg_color='#3d85c6',
-                                         font=ctk.CTkFont(size=18, weight="bold"), command=self.save_button_event)
+        self.save_icon = ctk.CTkImage(Image.open(self.image_path + 'save.png'), 
+                                      size=(25, 25))
+        self.save_button = ctk.CTkButton(self.button_frame, corner_radius=10, 
+                                         image=self.save_icon,
+                                         compound='left', text='Save', anchor='w', 
+                                         border_spacing=10, height=25,
+                                         text_color='gray90', hover_color='gray30', 
+                                         fg_color='#3d85c6',
+                                         font=ctk.CTkFont(size=18, weight="bold"), 
+                                         command=self.save_button_event)
         self.save_button.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
 
         # Add label
@@ -255,48 +266,64 @@ class DrawMainFrame(ctk.CTkFrame):
         self.pen_width = int(choice.split()[-1])
 
 
+
     def save_button_event(self):
+        # Kiểm tra và tạo file meta.csv nếu chưa tồn tại
+        meta_path = os.path.join(self.directory, 'meta.csv')
+        if not os.path.exists(meta_path):
+            # Tạo meta.csv nếu chưa có
+            initial_meta = pd.DataFrame({'Label': [], 'Count': []})
+            initial_meta.to_csv(meta_path, index=False)
+
         # Get the image label
         label = self.label_entry.get()
         if len(label) == 0:
             showerror(message='Please enter the label.', title='Label Error')
         else:
-            try:
-                digit = int(label)
-            except:
-                showerror(message='Label can only be a number from 0 to 9.', title='Label Error')
+            if len(label) > 1 or not label.isalpha() or not label.islower():
+                showerror(message='Label can only be a single lowercase letter (a-z).', title='Label Error')
             else:
-                if digit > 9 or digit < 0:
-                    showerror(message='Label can only be a number from 0 to 9.', title='Label Error')
-                else:
-                    # Get image ID and save
-                    meta = pd.read_csv(self.directory + 'meta.csv')
-                    num_images = meta['Count'].sum()
-                    image_id = num_images + 1
-                    image_path = self.directory + f'{image_id}-{digit}.png'
-                    self.current_image.save(image_path)
+                # Load meta.csv
+                meta = pd.read_csv(meta_path)
+                if label not in meta['Label'].values:
+                    # Add a new row if the label doesn't exist
+                    meta = pd.concat([meta, pd.DataFrame({'Label': [label], 'Count': [1]})], ignore_index=True)
 
-                    # Initialize new backend image
-                    self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
-                    self.draw = ImageDraw.Draw(self.current_image)
+                num_images = meta['Count'].sum()
+                image_id = num_images + 1
 
-                    # Update metadata
-                    meta.loc[meta['Label'] == digit, 'Count'] += 1
-                    meta.to_csv(self.directory + 'meta.csv', index=False)
+                # Resize current image to 28x28
+                resized_image = self.current_image.resize((28, 28), Image.LANCZOS)
+                image_path = os.path.join(self.directory, f'{label}_{image_id}.png')
+                resized_image.save(image_path)
+                resized_image = ImageOps.grayscale(resized_image)  # Ensure grayscale
 
-                    # Update the dataset
-                    img_array = process_image(image_path)
-                    data = img_array.reshape((-1)).tolist()
-                    data.append(digit)
+                # Convert image to 1D numpy array
+                img_array = np.array(resized_image).flatten()
 
-                    with open(self.directory + 'data.csv', 'a') as f:
-                        writer = csv.writer(f)
-                        writer.writerow(data)
+                # Save the image to the dataset (CSV file)
+                data_path = os.path.join(self.directory, 'data.csv')
+                data = img_array.tolist()
+                data.append(label)  # Add label as the last element
 
-                    # Update the message
-                    self.message_box.configure(state="normal")
-                    self.message_box.insert(tk.END, f'\n- Your image was saved successfully with ID = {image_id}. Label = {digit}')
-                    self.message_box.configure(state="disabled")
+                with open(data_path, 'a') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(data)
+
+                # Save metadata
+                meta.loc[meta['Label'] == label, 'Count'] += 1
+                meta.to_csv(meta_path, index=False)
+
+                # Initialize new backend image
+                self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
+                self.draw = ImageDraw.Draw(self.current_image)
+
+                # Update the message
+                self.message_box.configure(state="normal")
+                self.message_box.insert(tk.END, f'\n- Your image was saved successfully with ID = {image_id}. Label = {label}')
+                self.message_box.configure(state="disabled")
+
+
 
 
     def close(self):

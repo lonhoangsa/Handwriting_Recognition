@@ -8,3 +8,4 @@ CANVAS_HEIGHT = 400
 
 MODEL_LIST = ['KNN', 'SVM', 'LR', 'RF']
 
+

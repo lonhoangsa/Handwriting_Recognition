@@ -97,6 +97,7 @@ class TrainFrame(ctk.CTkFrame):
                                         border_color="#5A5A5A"  # Màu viền trắng
                                         )
         self.param_frame.grid(row=0, column=0, sticky='nsew', padx=10)
+
         self.param_frame.grid_columnconfigure(0, weight=1)
         self.param_frame.grid_columnconfigure(1, weight=1)
         self.param_frame.grid_columnconfigure(2, weight=1)
@@ -127,7 +128,11 @@ class TrainFrame(ctk.CTkFrame):
         self.metrics_menu.set('Choose weights')
         self.metrics_menu.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
 
-        # k-NN Params
+
+        # Cấu hình lưới (grid)
+        self.knn_frame.grid_rowconfigure((0, 1, 2, 3), weight=1)  # Các hàng có chiều cao cân bằng
+        self.knn_frame.grid_columnconfigure(0, weight=1)  # Cột đầu tiên co giãn theo chiều ngang
+
 
         # add SVM frame
         self.svm_frame = ctk.CTkFrame(self.param_frame,
@@ -165,6 +170,7 @@ class TrainFrame(ctk.CTkFrame):
                                                command=self.lr_penalty_event)
         self.lr_penalty_menu.set('Choose penalty')
         self.lr_penalty_menu.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
+
 
 
         # Add button frame and buttons
@@ -206,6 +212,7 @@ class TrainFrame(ctk.CTkFrame):
         # Add choose models
         self.model_menu = ctk.CTkComboBox(self.button_frame, height=30, values=[name for name in config.MODEL_LIST],
                                           command=self.model_menu_event
+
                                           )
         self.model_menu.set('Choose Current Model')
         self.model_menu.grid(row=3, column=0, padx=10, pady=10, sticky='ew')
