@@ -16,14 +16,14 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score
-from tensorflow.keras.models import load_model
+# from tensorflow.keras.models import load_model
 from PIL import Image, ImageDraw
 from tkinter import filedialog
 from tkinter.messagebox import showerror
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from utils import process_image
 
-from model.utils import load_model, preprocess_image, predict_characters
+from models.utils import load_model, preprocess_image, predict_characters
 
 class ImageViewer(ctk.CTkFrame):
     """
@@ -190,7 +190,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
         self.canvas_height = self.canvas.winfo_screenheight()
 
         # Image backend
-        self.current_image = Image.new('RGB', (self.canvas_width, self.canvas_height), color=(255, 255, 255))
+        self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
         # Image._show(self.current_image)
         self.draw = ImageDraw.Draw(self.current_image)
 
@@ -208,7 +208,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
         self.button_frame.grid_rowconfigure(4, weight=1)
         self.button_frame.grid_rowconfigure(5, weight=1)
 
-        # Add model label
+        # Add models label
         self.ml_icon = ctk.CTkImage(Image.open(self.image_path + 'robot.png'), size=(80, 80))
         self.model_label = ctk.CTkLabel(self.button_frame, font=ctk.CTkFont(size=20, weight="bold"), compound='top', 
                                         image=self.ml_icon, height=60, text='Live Prediction')
@@ -233,7 +233,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
         self.thick_combobox.set('Choose Pen Thickness')
         self.thick_combobox.grid(row=3, column=0, padx=10, pady=15, sticky='ew')
 
-        # Add choose model
+        # Add choose models
         self.model_menu = ctk.CTkComboBox(self.button_frame, height=30, values=config.MODEL_LIST, command=self.model_menu_event)
         self.model_menu.set('Choose Algorithm')
         self.model_menu.grid(row=4, column=0, padx=10, pady=15, sticky='ew')
@@ -263,7 +263,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def clear_canvas(self):
         self.canvas.delete('all')
         # New image backend
-        self.current_image = Image.new('RGB', (self.canvas_width, self.canvas_height), color=(255, 255, 255))
+        self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
         self.draw = ImageDraw.Draw(self.current_image)
         self.message_box.configure(state="normal")
         self.message_box.delete('1.0',tk.END)
@@ -284,7 +284,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def paint(self, event):
         x, y = event.x, event.y
         self.canvas.create_line((self.lastx, self.lasty, x, y), width=self.pen_width, fill='black', smooth=True, joinstyle='round')
-        self.draw.line([self.lastx, self.lasty, x, y], 0, width=self.pen_width, joint='curve')
+        self.draw.line([self.lastx, self.lasty, x, y], 255, width=self.pen_width, joint='curve')
         self.lastx, self.lasty = x, y
 
 
@@ -295,14 +295,14 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def model_menu_event(self, choice):
         self.model_type = choice
         
-        # Open model in the dir
+        # Open models in the dir
         result = " "
         # result = filedialog.askopenfilename(initialdir=config.MODEL_PATH + self.model_type)
         # filedialog.askdirectory(initialdir=config.MODEL_PATH + self.model_type)
         if len(result) == 0:
-            showerror(message="Please choose a model", title='Error')
+            showerror(message="Please choose a models", title='Error')
         else:
-            # Load the model
+            # Load the models
             if self.model_type == 'CNN':
                 self.model = load_model(result)
             else:
@@ -310,23 +310,24 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
 
 
     def predict_button_event(self):
-        # Check choose model
+        # Check choose models
         if self.model is None:
-            showerror(message="Please choose a model first", title='Error')
+            showerror(message="Please choose a models first", title='Error')
         else:
             image_path = config.CURRENT_IMAGE_PATH
             self.current_image.save(image_path)
 
-            img_array = process_image(image_path)
-
-
+            # img_array = process_image(image_path)
             if self.model_type != 'CNN':
                 characters = preprocess_image(image_path)
                 predictions = predict_characters(characters, self.model)
                 predictions = [string.ascii_lowercase[label - 1] for label in predictions]
                 word = ''.join(map(str, predictions))
-            else:
-                word = self.model.predict(x=img_array.reshape((1, 28, 28, 1))).argmax()
+                # plt.imshow(img_array)
+                # plt.show()
+                # data = img_array.reshape((1, -1))
+                # word = self.model.predict(data)
+                # word = string.ascii_lowercase[word[0] - 1]
             
             # Print out the result
             self.message_box.configure(state="normal")
@@ -451,7 +452,7 @@ class PredictBatchPredictionFrame(ctk.CTkFrame):
         self.dataset_label = ctk.CTkLabel(self.button_frame, font=ctk.CTkFont(size=20, weight="bold"), compound='left', image=self.data_image_icon, height=60)
         self.dataset_label.grid(row=0, column=0, padx=10, pady=10, sticky='new')
 
-        # Add choose model
+        # Add choose models
         self.model_menu = ctk.CTkComboBox(self.button_frame, height=40, values=config.MODEL_LIST, command=self.model_menu_event)
         self.model_menu.set('Choose Algorithm')
         self.model_menu.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
@@ -495,12 +496,12 @@ class PredictBatchPredictionFrame(ctk.CTkFrame):
     def model_menu_event(self, choice):
         self.model_type = choice
         
-        # Open model in the dir
+        # Open models in the dir
         result = filedialog.askopenfilename(initialdir=config.MODEL_PATH + self.model_type)
         if len(result) == 0:
-            showerror(message="Please choose a model", title='Error')
+            showerror(message="Please choose a models", title='Error')
         else:
-            # Load the model
+            # Load the models
             if self.model_type == 'CNN':
                 self.model = load_model(result)
             else:
@@ -510,7 +511,7 @@ class PredictBatchPredictionFrame(ctk.CTkFrame):
 
     def summary_button_event(self):
         if self.model is None:
-            showerror(message='Please specify a model first.', title='Model Error')
+            showerror(message='Please specify a models first.', title='Model Error')
             return
 
         # Add Confusion matrix
