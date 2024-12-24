@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score
-from tensorflow.keras.models import load_model
+# from tensorflow.keras.models import load_model
 from PIL import Image, ImageDraw
 from tkinter import filedialog
 from tkinter.messagebox import showerror
@@ -190,7 +190,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
         self.canvas_height = self.canvas.winfo_screenheight()
 
         # Image backend
-        self.current_image = Image.new('RGB', (self.canvas_width, self.canvas_height), color=(255, 255, 255))
+        self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
         # Image._show(self.current_image)
         self.draw = ImageDraw.Draw(self.current_image)
 
@@ -259,7 +259,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def clear_canvas(self):
         self.canvas.delete('all')
         # New image backend
-        self.current_image = Image.new('RGB', (self.canvas_width, self.canvas_height), color=(255, 255, 255))
+        self.current_image = Image.new('L', (self.canvas_width, self.canvas_height))
         self.draw = ImageDraw.Draw(self.current_image)
         self.message_box.configure(state="normal")
         self.message_box.delete('1.0',tk.END)
@@ -279,7 +279,7 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
     def paint(self, event):
         x, y = event.x, event.y
         self.canvas.create_line((self.lastx, self.lasty, x, y), width=self.pen_width, fill='black', smooth=True, joinstyle='round')
-        self.draw.line([self.lastx, self.lasty, x, y], 0, width=self.pen_width, joint='curve')
+        self.draw.line([self.lastx, self.lasty, x, y], 255, width=self.pen_width, joint='curve')
         self.lastx, self.lasty = x, y
 
 
@@ -312,16 +312,17 @@ class PredictLivePredictionFrame(ctk.CTkFrame):
             image_path = config.CURRENT_IMAGE_PATH
             self.current_image.save(image_path)
 
-            img_array = process_image(image_path)
-
-
+            # img_array = process_image(image_path)
             if self.model_type != 'CNN':
                 characters = preprocess_image(image_path)
                 predictions = predict_characters(characters, self.model)
                 predictions = [string.ascii_lowercase[label - 1] for label in predictions]
                 word = ''.join(map(str, predictions))
-            else:
-                word = self.model.predict(x=img_array.reshape((1, 28, 28, 1))).argmax()
+                # plt.imshow(img_array)
+                # plt.show()
+                # data = img_array.reshape((1, -1))
+                # word = self.model.predict(data)
+                # word = string.ascii_lowercase[word[0] - 1]
             
             # Print out the result
             self.message_box.configure(state="normal")

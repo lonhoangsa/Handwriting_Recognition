@@ -18,11 +18,10 @@ import time
 import joblib
 import torch
 import torchvision
-from cv2.gapi import kernel
 from torchvision.transforms import transforms
 
 import config
-
+import pickle
 from copy import deepcopy
 from PIL import Image
 from sklearn.metrics import confusion_matrix, accuracy_score
@@ -292,7 +291,7 @@ class TrainFrame(ctk.CTkFrame):
         self.canvas_confusion_mat.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 
         # Set up models and its hyperparameters
-        if self.model_type == 'k-NN':
+        if self.model_type == 'KNN':
             k_entry = self.k_choice_entry.get()
             p_entry = self.p_choice_entry.get()
 
@@ -337,7 +336,7 @@ class TrainFrame(ctk.CTkFrame):
 
             self.model = SVC(kernel='rbf', C=self.svm_C, gamma=self.svm_gamma, random_state=42)
 
-        else:
+        elif self.model_type == 'LR':
             c_entry = self.lr_c_choice_entry.get()
 
             if len(c_entry) == 0:
@@ -381,8 +380,13 @@ class TrainFrame(ctk.CTkFrame):
                 ax=self.ax_confusion_mat
             )
 
-            self.ax_confusion_mat.set_xticklabels(list(string.ascii_uppercase))
-            self.ax_confusion_mat.set_yticklabels(list(string.ascii_uppercase))
+            # Set the tick locations to match the number of labels
+            tick_locations = np.arange(len(string.ascii_lowercase))
+
+            self.ax_confusion_mat.set_xticks(tick_locations)
+            self.ax_confusion_mat.set_xticklabels(list(string.ascii_lowercase))
+            self.ax_confusion_mat.set_yticks(tick_locations)
+            self.ax_confusion_mat.set_yticklabels(list(string.ascii_lowercase))
             self.ax_confusion_mat.set_ylabel('True Label')
             self.ax_confusion_mat.set_xlabel('Prediction Label')
             self.ax_confusion_mat.set_title('Confusion Matrix')
@@ -412,7 +416,7 @@ class TrainFrame(ctk.CTkFrame):
 
         # Start running learning curve
         self.queue = mp.Queue()
-        self.process = mp.Process(target=learning_curve_plot, args=(self.queue, deepcopy(self.model)))
+        self.process = mp.Process(target=learning_curve_plot, args=(self.queue, self.model))
         self.process.start()
 
         # Start process bar
@@ -451,9 +455,12 @@ class TrainFrame(ctk.CTkFrame):
             return
 
         # Save the models
-        model_name = self.model_type + '.pkl'
-        with open(model_name, 'wb') as file:
-            pickle.dump(config.MODEL_PATH + self.model)
+        model_name = str(self.model_type).lower()
+        model_save_path = './' + config.MODEL_PATH + model_name + '.pkl'
+        print(model_save_path)
+
+        with open(model_save_path, 'wb') as file:
+            pickle.dump(self.model, file)
 
         self.insert_text('Save successfully')
 
@@ -484,14 +491,17 @@ def data_to_numpy(data):
 
 def train_model(queue, model):
     # Get the dataset
-    transform = transforms.Compose([transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Grayscale(num_output_channels=1),
+        transforms.ToTensor()
+    ])
     train_test = torchvision.datasets.EMNIST(root='./data', split='letters', train=True, download=True,
                                             transform=transform)
     x_train, y_train = data_to_numpy(train_test)
     test_set = torchvision.datasets.EMNIST(root='./data', split='letters', train=False, download=True,
                                           transform=transform)
     x_test, y_test = data_to_numpy(test_set)
-    _, x_test_subset, _, y_test_subset = train_test_split(x_test, y_test, test_size=1000, stratify=y_test,
+    _, x_test_subset, _, y_test_subset = train_test_split(x_test, y_test, test_size=100, stratify=y_test,
                                                           random_state=42)
 
     print('Start Training')
@@ -505,7 +515,10 @@ def train_model(queue, model):
 
 def learning_curve_plot(queue, model):
     # Get the dataset
-    transform = transforms.Compose([transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Grayscale(num_output_channels=1),
+        transforms.ToTensor()])
+
     train_test = torchvision.datasets.EMNIST(root='./data', split='letters', train=True, download=True,
                                              transform=transform)
     x_train, y_train = data_to_numpy(train_test)

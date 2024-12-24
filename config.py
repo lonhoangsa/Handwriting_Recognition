@@ -6,5 +6,5 @@ CURRENT_IMAGE_PATH = r'data/users/temp/temp.png'
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 400
 
-MODEL_LIST = ['KNN', 'SVM']
+MODEL_LIST = ['KNN', 'SVM', 'LR', 'RF']
 
