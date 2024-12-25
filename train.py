@@ -101,6 +101,7 @@ class TrainFrame(ctk.CTkFrame):
         self.param_frame.grid_columnconfigure(0, weight=1)
         self.param_frame.grid_columnconfigure(1, weight=1)
         self.param_frame.grid_columnconfigure(2, weight=1)
+        self.param_frame.grid_columnconfigure(3, weight=1)
         self.param_frame.grid_rowconfigure(0, weight=1)
         self.param_frame.grid_rowconfigure(1, weight=1)
 
@@ -171,7 +172,30 @@ class TrainFrame(ctk.CTkFrame):
         self.lr_penalty_menu.set('Choose penalty')
         self.lr_penalty_menu.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
 
-
+        #Add Random Forest frame
+        self.rf_frame = ctk.CTkFrame(self.param_frame,
+                                        border_width=1,
+                                        border_color="#CB4343"
+                                        )
+        self.rf_frame.grid(row=0, column=3, sticky='nsew', padx=10, pady=10)
+        self.rf_frame.grid_columnconfigure(0, weight=1)
+        self.rf_label = ctk.CTkLabel(master=self.rf_frame,
+                                        text="Random Forest",
+                                        font=ctk.CTkFont(size=20, weight="bold"))
+        self.rf_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.rf_n_estimators_entry = ctk.CTkEntry(self.rf_frame, corner_radius=10,
+                                                    placeholder_text='Enter n_estimators', height=30)
+        self.rf_n_estimators_entry.grid(row=2, column=0, padx=10, pady=10, sticky='nsew')
+        self.rf_max_depth_entry = ctk.CTkEntry(self.rf_frame, corner_radius=10,
+                                                placeholder_text='Enter max_depth', height=30)
+        self.rf_max_depth_entry.grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
+        self.rf_min_samples_split_entry = ctk.CTkEntry(self.rf_frame, corner_radius=10,
+                                                        placeholder_text='Enter min_samples_split', height=30)
+        self.rf_min_samples_split_entry.grid(row=4, column=0, padx=10, pady=10, sticky='nsew')
+        self.rf_min_samples_leaf_entry = ctk.CTkEntry(self.rf_frame, corner_radius=10,
+                                                        placeholder_text='Enter min_samples_leaf', height=30)
+        self.rf_min_samples_leaf_entry.grid(row=5, column=0, padx=10, pady=10, sticky='nsew')
+        
 
         # Add button frame and buttons
         self.button_frame = ctk.CTkFrame(self,
